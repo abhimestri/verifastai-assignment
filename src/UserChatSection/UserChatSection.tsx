@@ -1,21 +1,17 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import Header from "./Header";
 import ChatInterface from "./ChatInterface";
 import { ChatContext } from "../context";
-
-interface UserChatSectionProps {
-  showChatList?: boolean;
-  setShowChatList?: (data: boolean) => void;
-}
+import { ChatDetailsContextProps, UserChatSectionProps } from "../types";
 
 const UserChatSection = ({
   showChatList = true,
   setShowChatList,
 }: UserChatSectionProps) => {
-  const { chatDetails } = useContext(ChatContext);
+  const { chatDetails } = useContext<ChatDetailsContextProps>(ChatContext);
   return (
     <>
-      {chatDetails ? (
+      {chatDetails?.id ? (
         <div className="w-full">
           <Header
             chatDetails={chatDetails}

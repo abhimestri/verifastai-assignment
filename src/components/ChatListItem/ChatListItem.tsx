@@ -5,14 +5,16 @@ import img2 from "../../assets/img2.png";
 import img3 from "../../assets/img3.png";
 import img4 from "../../assets/img4.png";
 import moment from "moment";
+import { ChatDetailsContextProps, ChatProps } from "../../types";
 
 interface ChatListItemProps {
-  chat: any;
+  chat: ChatProps;
   onClick?: (data?: any) => void;
 }
+export const avatarList = [img1, img2, img3, img4];
 const ChatListItem = ({ chat, onClick }: ChatListItemProps) => {
-  const { chatDetails }: any = useContext(ChatContext);
-  const avatarList = [img1, img2, img3, img4];
+  const { chatDetails } = useContext<ChatDetailsContextProps>(ChatContext);
+
   const lastActiveTimestamp = moment(
     chat?.messages[chat?.messages?.length - 1]?.timestamp
   )?.fromNow();
@@ -24,7 +26,7 @@ const ChatListItem = ({ chat, onClick }: ChatListItemProps) => {
       }`}
     >
       <div className="w-[60px] h-[50px] rounded-[50px] bg-[#ccc] overflow-hidden">
-        <img src={avatarList[Math?.floor((chat?.id % 10) / 3)]} alt="" />
+        <img src={avatarList[Math?.floor((+chat?.id % 10) / 3)]} alt="" />
       </div>
       <div className="w-full flex justify-between mt-1">
         <p className="text-[14px] text-[#000929] w-[70%] line-clamp-2 leading-[18px]">

@@ -6,30 +6,42 @@ import { getChatList } from "./api";
 import UserChatSection from "./UserChatSection/UserChatSection";
 import { ChatContext } from "./context";
 import { useMediaQuery } from "react-responsive";
+import { ChatProps, PageCountDetailsProps } from "./types";
 
 const App = () => {
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 760px)" });
-  const [showChatList, setShowChatList] = useState(true);
-  const [chatList, setChatList] = useState<Array<any>>([]);
-  const [chatDetails, setChatDetails] = useState<any>();
-  const [pageCountDetails, setPageCountDetails] = useState<any>({
-    currentPage: 1,
-    maxPages: 0,
+  const [showChatList, setShowChatList] = useState<boolean>(true);
+  const [chatList, setChatList] = useState<Array<ChatProps>>([]);
+  const [chatDetails, setChatDetails] = useState<ChatProps>({
+    name: "",
+    id: "",
+    messages: [],
   });
+  const [pageCountDetails, setPageCountDetails] =
+    useState<PageCountDetailsProps>({
+      currentPage: 1,
+      maxPages: 0,
+    });
+  const [isChatListLoading, setIsChatListLoading] = useState<boolean>(true);
+  const [dataError, setDateError] = useState<boolean>(false);
 
   useEffect(() => {
     if (!chatList?.length && pageCountDetails?.maxPages === 0) {
-      getChatList(pageCountDetails)?.then((data) => {
-        setPageCountDetails({
-          currentPage: data?.chatSessionsData?.current_page,
-          maxPages: data?.chatSessionsData?.pages,
-        });
-        setChatList([...data?.chatSessionsData?.chat_sessions]);
+      getChatList({ pageCountDetails, setDateError })?.then((data) => {
+        if (data?.chatSessionsData?.chat_sessions?.length) {
+          setPageCountDetails({
+            currentPage: data?.chatSessionsData?.current_page,
+            maxPages: data?.chatSessionsData?.pages,
+          });
+          setChatList([...data?.chatSessionsData?.chat_sessions]);
+          setIsChatListLoading(false);
+        }
       });
     }
-  }, [chatList, pageCountDetails]);
-
-  console.log({ pageCountDetails });
+    if (dataError) {
+      setIsChatListLoading(false);
+    }
+  }, [chatList, pageCountDetails, dataError]);
 
   return (
     <ChatContext.Provider
@@ -50,6 +62,8 @@ const App = () => {
                 setPageCountDetails={setPageCountDetails}
                 setShowChatList={setShowChatList}
                 isTabletOrMobile={isTabletOrMobile}
+                isChatListLoading={isChatListLoading}
+                dataError={dataError}
               />
             ) : (
               <UserChatSection
@@ -65,6 +79,8 @@ const App = () => {
               chatList={chatList}
               setChatList={setChatList}
               setPageCountDetails={setPageCountDetails}
+              isChatListLoading={isChatListLoading}
+              dataError={dataError}
             />
             <UserChatSection />
           </div>
